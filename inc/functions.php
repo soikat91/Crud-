@@ -6,29 +6,34 @@ function seed(){
    $data=array(
 
        array(
+            'id'=>"1",
            'fname'=>"Soikat",
            "lname"=>"Eman",
            "roll"=>5
        ),
        array(
+           'id'=>"2",
            'fname'=>"Mehfuz",
            "lname"=>"Ahmed",
            "roll"=>3
        ),
        array(
+            'id'=>"3",
            'fname'=>"Rahim",
            "lname"=>"Eman",
            "roll"=>2
        ),
        array(
+            'id'=>"4",
            'fname'=>"Korim",
            "lname"=>"Eman",
            "roll"=>4
        ),
        array(
+            'id'=>"5",
            'fname'=>"Soikat",
            "lname"=>"Eman",
-           "roll"=>5
+           "roll"=>8
        )
    );
 
@@ -43,6 +48,7 @@ function genarateReport(){
   ?>
     <table border="1">
         <tr>
+        <th>ID</th>
         <th>Name</th>
         <th>Roll</th>
         <th>Action</th>
@@ -50,11 +56,15 @@ function genarateReport(){
         <?php
 
         foreach($students as $student){
+            // echo "<pre>";
+            // print_r($students);
+            // exit();
         ?>
         <tr>
+            <td><?php echo $student['id']?></td>
             <td> <?php printf(" %s %s" ,$student['fname'] ,$student['lname']);?></td>
             <td><?php echo $student['roll']; ?></td>
-            <td><a href="<?php echo $student['roll']?>">Edit</a> |<a href="">Delete</a></td>
+            <td><a href="index.php?task=edit&id=<?php echo $student['id']?>">Edit</a> |<a href="<?php echo $student['roll']?>">Delete</a></td>
         </tr>
         <?php
       }
@@ -82,8 +92,9 @@ function addStudent($fname,$lname,$roll){
     }
 
     if(!$roll_found){
+        $newId=count($students)+1;
         $student=[
-
+            'id'=>$newId,
             'fname'=>$fname,
             'lname'=>$lname,
             'roll'=>$roll
@@ -95,5 +106,51 @@ function addStudent($fname,$lname,$roll){
     return false;
     
      
+   
+}
+
+
+function getStudentData($id){
+
+    $serialize=file_get_contents(Db_name);
+    $students=unserialize($serialize);
+
+    foreach($students as $student){
+        
+       if($student['id']==$id){
+
+        return $student;
+       }
+       
+    }
+    return false;
+}
+
+function updateStudent($id,$fname,$lname, $roll){
+
+
+    $serialize=file_get_contents(Db_name);
+    $students=unserialize($serialize);
+    $roll_found=false;
+
+    foreach($students as $student){
+        if($student['roll']==$roll && $student['id'] !=$id){
+
+           $roll_found=true;
+           break;
+        }
+      
+    }
+
+    if(!$roll_found){
+        $students[$id-1]['fname']=$fname;
+        $students[$id-1]['lname']=$lname;
+        $students[$id-1]['roll']=$roll;
+    
+        file_put_contents(Db_name,serialize($students),LOCK_EX);
+        return true;
+    }
+    return false;
+
    
 }

@@ -8,30 +8,43 @@ require_once "./inc/functions.php";
    $info="Data load into file  successfully";
  }
 
+ $fname='';
+ $lname='';
+ $roll='';
  if(isset($_POST['submit'])){
 
     $fname=$_POST['fname'];
     $lname=$_POST['lname'];
     $roll=$_POST['roll'];
+    $id=$_POST['id'];
 
-    if($fname !='' && $lname !='' && $roll !=''){
-      
-      $result= addStudent($fname,$lname,$roll);
-      
-      if($result){
+
+    if($id){
+      if($fname !='' && $lname !='' && $roll !=''){
+         
+        updateStudent($id,$fname,$lname, $roll);
          header("location:index.php?task=report");
-      }else{
-
-         header('location:index.php?error=1');
-      }
-     
-    
+       }
    }else{
-      echo "Please input data";
-    }
+      if($fname !='' && $lname !='' && $roll !=''){
+      
+         $result= addStudent($fname,$lname,$roll);
+         
+         if($result){
+            header("location:index.php?task=report");
+         }else{
+   
+            // header('location:index.php?error=1');
+            $error=1;//error sms show kore
+         }
+      
+      
+      }else{
+         $error=2;
+      }
+    }    
 
-
- }
+}
 
 ?>
 
@@ -60,10 +73,14 @@ require_once "./inc/functions.php";
          
          if('1'==$error){?>
 
-            <h1> duplicate roll number</h1>
+            <h1> Duplicate roll number</h1>
          <?php
 
-         }
+         }elseif('2'==$error){?>
+         <h1> Please Fill Up all Field</h1>
+         
+      <?php
+      }
       
       ?>
   
@@ -84,18 +101,44 @@ require_once "./inc/functions.php";
       ?>
       <?php
       if('add'==$task){?>
-      <form action="index.php?report" method="post">
+      <form action="index.php?task=add" method="post">
           
          <label for="fname">First Name</label>
-         <input type="text" name="fname">
+         <input type="text" name="fname" value="<?php echo $fname ?>">
          <label for="lname">Last Name</label>
-         <input type="text" name="lname">         
+         <input type="text" name="lname" value="<?php echo $lname ?>">         
          <label for="roll">Roll</label>
-         <input type="number" name="roll" id="">
+         <input type="number" name="roll" id="" value="<?php echo $roll?>">
          <button type="submit" name="submit" value="save">Save</button>
 
         
       </form>
       <?php } ?>
+     
+      <?php
+      if('edit'==$task):
+         
+         $id=$_GET['id'];
+         $student=getStudentData($id);
+         if($student):
+         ?>
+      <form action="index.php?task=edit" method="post">
+
+         <input type="hidden" name="id" value="<?php echo $id?>">
+         <label for="fname">First Name</label>
+         <input type="text" name="fname" value="<?php echo $student['fname'] ?>">
+         <label for="lname">Last Name</label>
+         <input type="text" name="lname" value="<?php echo $student['lname'] ?>">         
+         <label for="roll">Roll</label>
+         <input type="number" name="roll" value="<?php echo $student['roll']?>">
+         <button type="submit" name="submit" value="save">Save</button>
+
+        
+      </form>
+      <?php
+      endif;
+      endif;
+         ?>
+         
 </body>
 </html>
