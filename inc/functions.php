@@ -64,7 +64,7 @@ function genarateReport(){
             <td><?php echo $student['id']?></td>
             <td> <?php printf(" %s %s" ,$student['fname'] ,$student['lname']);?></td>
             <td><?php echo $student['roll']; ?></td>
-            <td><a href="index.php?task=edit&id=<?php echo $student['id']?>">Edit</a> |<a href="<?php echo $student['roll']?>">Delete</a></td>
+            <td><a href="index.php?task=edit&id=<?php echo $student['id']?>">Edit</a> |<a class="deleteData" href="index.php?task=delete&id=<?php echo $student['id']?>">Delete</a></td>
         </tr>
         <?php
       }
@@ -92,7 +92,7 @@ function addStudent($fname,$lname,$roll){
     }
 
     if(!$roll_found){
-        $newId=count($students)+1;
+        $newId=getStudentId($students);
         $student=[
             'id'=>$newId,
             'fname'=>$fname,
@@ -107,6 +107,11 @@ function addStudent($fname,$lname,$roll){
     
      
    
+}
+function getStudentId($students){
+
+    $getid=max(array_column($students,'id'));
+    return $getid+1;
 }
 
 
@@ -127,7 +132,6 @@ function getStudentData($id){
 }
 
 function updateStudent($id,$fname,$lname, $roll){
-
 
     $serialize=file_get_contents(Db_name);
     $students=unserialize($serialize);
@@ -153,4 +157,31 @@ function updateStudent($id,$fname,$lname, $roll){
     return false;
 
    
+}
+
+function deleteStudent($id){
+
+    $serialize=file_get_contents(Db_name);
+    $students=unserialize($serialize);
+
+    foreach($students as $offSet=>$student){
+        if($student['id']==$id){
+            unset($students[$offSet]);
+        }
+    }
+
+   
+
+    file_put_contents(Db_name,serialize($students),LOCK_EX);    
+
+
+}
+
+function printArray(){
+
+    $serialize=file_get_contents(Db_name);
+    $students=unserialize($serialize);
+
+    echo "<pre>";
+    print_r($students);
 }

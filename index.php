@@ -3,6 +3,13 @@ require_once "./inc/functions.php";
  $info='';
  $task=$_GET['task'] ?? 'ja sms dibo tai show korbe';
  $error=$_GET['error'] ?? 0;
+
+
+ if('delete'==$task){
+   $id=$_GET['id'];
+   deleteStudent($id);
+   header("location:index.php?task=report");
+ }
  if('seed'==$task){
    seed();
    $info="Data load into file  successfully";
@@ -11,6 +18,7 @@ require_once "./inc/functions.php";
  $fname='';
  $lname='';
  $roll='';
+ $id='';
  if(isset($_POST['submit'])){
 
     $fname=$_POST['fname'];
@@ -22,8 +30,15 @@ require_once "./inc/functions.php";
     if($id){
       if($fname !='' && $lname !='' && $roll !=''){
          
-        updateStudent($id,$fname,$lname, $roll);
-         header("location:index.php?task=report");
+         $updateData=updateStudent($id,$fname,$lname, $roll);
+         if($updateData){
+
+            header("location:index.php?task=report");
+
+         }else{
+            $error='1';
+         }
+         
        }
    }else{
       if($fname !='' && $lname !='' && $roll !=''){
@@ -81,6 +96,12 @@ require_once "./inc/functions.php";
          
       <?php
       }
+
+     // if($error=='3'){ ?>
+
+
+<?php
+      //}
       
       ?>
   
@@ -97,8 +118,11 @@ require_once "./inc/functions.php";
   
          <?php
           }
+
+          //printArray();
       
       ?>
+        
       <?php
       if('add'==$task){?>
       <form action="index.php?task=add" method="post">
@@ -122,7 +146,7 @@ require_once "./inc/functions.php";
          $student=getStudentData($id);
          if($student):
          ?>
-      <form action="index.php?task=edit" method="post">
+      <form action="" method="post">
 
          <input type="hidden" name="id" value="<?php echo $id?>">
          <label for="fname">First Name</label>
@@ -141,4 +165,25 @@ require_once "./inc/functions.php";
          ?>
          
 </body>
+<script>
+
+   //alert('hi'); 
+   document.addEventListener('DOMContentLoaded',function(){
+      
+      console.log('loader');
+
+      var links=document.querySelectorAll(".deleteData");
+      for(i=0;i<links.length;i++){
+         links[i].addEventListener('click',function(e){
+            if(!confirm("Are you Sure")){
+
+               e.preventDefault();
+      
+            }
+         });
+      }
+
+   });
+
+</script>
 </html>
